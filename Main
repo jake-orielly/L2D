@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border: 1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+
+var player;
+var object;
+var boardY = 700;
+var boardX = 700;
+var bulletSpeed = 5;
+
+function startGame() {
+	player = new component(30, 30, "red", 50, 150, "red");
+	gameArea.start();
+}
+
+var gameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = boardX;
+        this.canvas.height = boardY;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+		this.interval = setInterval(updateGameArea, 20);
+		window.addEventListener("mousedown", mouseDown);
+		window.addEventListener('keydown', function (e) {
+            gameArea.keys = (gameArea.keys || []);
+            gameArea.keys[e.keyCode] = true;
+        })
+        window.addEventListener('keyup', function (e) {
+            gameArea.keys[e.keyCode] = false; 
+        })
+    },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(width, height, color, x, y, name) {
+	this.name = name;
+    this.width = width;
+    this.height = height;
+	this.speedX = 0;
+    this.speedY = 0;
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = gameArea.context;
+		if (this.name == "text") {
+		  ctx.font = this.width + " " + this.height;
+		  ctx.fillStyle = color;
+		  ctx.fillText(this.text, this.x, this.y);
+		}
+		else {
+		  ctx.fillStyle = color;
+		  ctx.fillRect(this.x, this.y, this.width, this.height);
+		}
+    }
+	
+    this.newPos = function() {
+		this.x += this.speedX;
+		this.y += this.speedY;        
+	}
+} 
+
+function updateGameArea() {
+    gameArea.clear();
+	stopMoving(player);
+	
+    if (gameArea.keys) {
+		handleInput();
+	}
+	
+	if (object) {
+		object.newPos();
+		object.update();
+	}
+	
+    player.newPos();
+    player.update();
+}
+
+function mouseDown(event) {
+	var x = event.x;
+	var y = event.y;
+	
+	object = new component(6, 6, "black", player.x, player.y, "bullet");
+	
+	var target = targetMouse(x,y);
+	object.speedX = target[0];
+	object.speedY = target[1];
+	
+}
+
+function targetMouse(x,y) {
+	var xDiff = (x - (player.x + player.width/2));
+	var yDiff = (y - (player.y + player.height/2));
+	var xRatio = xDiff/(Math.abs(xDiff) + Math.abs(yDiff));
+	var yRatio = yDiff/(Math.abs(xDiff) + Math.abs(yDiff));
+	
+	if (xRatio > yRatio)
+		max = xRatio;
+	else
+		max = yRatio;
+	
+	var xResult = xRatio * Math.abs(bulletSpeed/max);
+	var yResult = yRatio * Math.abs(bulletSpeed/max);
+	alert(xRatio + " ; " + yRatio);
+	return [xResult,yResult];
+}
+
+function handleInput() {
+    if (gameArea.keys[87]) {player.speedY = -5; }
+    if (gameArea.keys[83]) {player.speedY = 5;}
+	if (gameArea.keys[65]) {player.speedX = -5; }
+    if (gameArea.keys[68]) {player.speedX = 5; }
+}
+
+function stopMoving(given) {
+	given.speedX = 0;
+    given.speedY = 0;
+}
+</script>
+
+</body>
+</html>
