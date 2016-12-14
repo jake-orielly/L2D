@@ -21,6 +21,8 @@ var bulletSpeed = 10;
 //0 = pistol, 1 = shotgun
 var gun = 1;
 
+var shotgun = {spread: 25, pellets: 6};
+
 function startGame() {
 	player = new component(30, 30, "red", 150, 150, "red");
 	gameArea.start();
@@ -143,10 +145,17 @@ function shoot(x,y) {
 	}
 	else if (gun == 1) {
 		if (!bullet) {
-			bullet = {data: [new component(3, 3, "black", player.x, player.y, "bullet")],
-			next: null};
-			bullet.data[0].speedX = target[0];
-			bullet.data[0].speedY = target[1];
+			var pellets = [];
+			for (var i = 0; i < shotgun.pellets; i++)
+				pellets[i] = new component(3, 3, "black", player.x, player.y, "bullet");
+			
+			bullet = {data: pellets, next: null};
+			
+			for (var i = 0; i < bullet.data.length; i++) {
+				target = targetMouse(x+spread(shotgun.spread),y+spread(shotgun.spread));
+				bullet.data[i].speedX = target[0];
+				bullet.data[i].speedY = target[1];
+			}
 		}
 		
 		else {
@@ -154,12 +163,27 @@ function shoot(x,y) {
 			while (current.next != null)
 				current = current.next;
 			
-			current.next = {data: [new component(3, 3, "black", player.x, player.y, "bullet")],
-			next: null};
-			current.next.data[0].speedX = target[0];
-			current.next.data[0].speedY = target[1];
+			var pellets = [];
+			for (var i = 0; i < shotgun.pellets; i++)
+				pellets[i] = new component(3, 3, "black", player.x, player.y, "bullet");
+			
+			current.next = {data: pellets, next: null};
+			
+			for (var i = 0; i < current.next.data.length; i++) {
+				target = targetMouse(x+spread(shotgun.spread),y+spread(shotgun.spread));
+				current.next.data[i].speedX = target[0];
+				current.next.data[i].speedY = target[1];
+			}
 		}
 	}
+}
+
+function randRange(min,max) {
+	return Math.random()*(max-min)+min;
+}
+
+function spread(given) {
+	return randRange(given*-1,given);
 }
 
 function targetMouse(x,y) {
