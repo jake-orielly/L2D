@@ -208,6 +208,8 @@ function handleInput() {
     if (gameArea.keys[83]) {player.speedY = 5;}
 	if (gameArea.keys[65]) {player.speedX = -5; }
     if (gameArea.keys[68]) {player.speedX = 5; }
+    if (gameArea.keys[49]) {gun = 0;}
+    if (gameArea.keys[50]) {gun = 1;}
 }
 
 function stopMoving(given) {
