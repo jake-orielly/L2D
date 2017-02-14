@@ -19,8 +19,7 @@ var boardX = 700;
 var bulletSpeed = 10;
 
 //0 = pistol, 1 = shotgun
-var gun = 1;
-
+var gun = 0;
 var shotgun = {spread: 25, pellets: 6};
 
 function startGame() {
@@ -58,6 +57,7 @@ function component(width, height, color, x, y, name) {
     this.speedY = 0;
     this.x = x;
     this.y = y;    
+    this.color = color;
     this.update = function() {
         ctx = gameArea.context;
 		if (this.name == "text") {
@@ -96,12 +96,12 @@ function updateGameArea() {
 			refresh(current.data);
 		
 		while (current.next != null) {
-			if (current.data instanceof Array)
-				current.data.forEach(function(i) {
+			if (current.next.data instanceof Array)
+				current.next.data.forEach(function(i) {
 				refresh(i);
 				});
 			else 
-				refresh(current.data);
+				refresh(current.next.data);
 			current = current.next;
 		}
 	}
