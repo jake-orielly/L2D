@@ -83,7 +83,23 @@ function component(width, height, color, x, y, name) {
 		  ctx.fillRect(this.x, this.y, this.width, this.height);
 		}
     }
-	
+    
+	this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+    
     this.newPos = function() {
 		this.x += this.speedX;
 		this.y += this.speedY;        
@@ -93,20 +109,34 @@ function component(width, height, color, x, y, name) {
 function updateGameArea() {
     gameArea.clear();
 	stopMoving(player);
-	
+    
     if (gameArea.keys) {
 		handleInput();
 	}
 	
 	if (bullet) {
         linkedListUpdate(bullet);
+        detectHit();
 	}
-	
-    refresh(player);
     
     linkedListUpdate(enemy);
+    refresh(player);
 }
 
+function detectHit() {
+    var current = bullet;
+    var x = 0;
+    if (!current.next) {
+        var currentEnemy = enemy;
+        while (currentEnemy) {
+            if (bullet.data.crashWith(currentEnemy.data)) {
+                bullet = 0;
+            }
+            currentEnemy = currentEnemy.next;
+        }
+    }
+}    
+    
 function linkedListUpdate(given) {
     var current = given;
 
