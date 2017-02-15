@@ -25,10 +25,21 @@ var shotgun = {spread: 25, pellets: 6};
 
 function startGame() {
 	player = new component(30, 30, "red", 150, 150, "red");
-    enemy = new component(20, 20, "green", 250, 250, "red");
+    
+    createEnemies();
+    
 	gameArea.start();
 }
 
+function createEnemies() {
+    enemy = {next: null, data:new component(20, 20, "green", 250, 250, "red")};
+    var previous = enemy;
+    for (var i = 0; i < 3; i++) {
+        previous.next = {next: null, data:new component(20, 20, "green", 250+i*40, 250, "red")}
+        previous = previous.next;
+    }
+}    
+    
 var gameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
@@ -88,7 +99,16 @@ function updateGameArea() {
 	}
 	
 	if (bullet) {
-		var current = bullet;
+        linkedListUpdate(bullet);
+	}
+	
+    refresh(player);
+    
+    linkedListUpdate(enemy);
+}
+
+function linkedListUpdate(given) {
+    var current = given;
 
 		if (current.data instanceof Array)
 			current.data.forEach(function(i) {
@@ -106,12 +126,9 @@ function updateGameArea() {
 				refresh(current.next.data);
 			current = current.next;
 		}
-	}
-	
-    refresh(enemy);
-    refresh(player);
-}
-
+    
+}    
+    
 function refresh (object) {
 	object.newPos();
 	object.update();
