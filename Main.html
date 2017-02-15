@@ -13,6 +13,7 @@ canvas {
 <script>
 
 var player;
+var enemy;
 var bullet;
 var boardY = 700;
 var boardX = 700;
@@ -24,6 +25,7 @@ var shotgun = {spread: 25, pellets: 6};
 
 function startGame() {
 	player = new component(30, 30, "red", 150, 150, "red");
+    enemy = new component(20, 20, "green", 250, 250, "red");
 	gameArea.start();
 }
 
@@ -106,6 +108,7 @@ function updateGameArea() {
 		}
 	}
 	
+    refresh(enemy);
     refresh(player);
 }
 
