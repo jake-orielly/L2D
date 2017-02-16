@@ -32,10 +32,10 @@ function startGame() {
 }
 
 function createEnemies() {
-    enemy = {next: null, data:new component(20, 20, "green", 250, 250, "red")};
+    enemy = {next: null, data:new component(20, 20, "green", 280, 240, "red")};
     var previous = enemy;
     for (var i = 0; i < 3; i++) {
-        previous.next = {next: null, data:new component(20, 20, "green", 250+i*40, 250, "red")}
+        previous.next = {next: null, data:new component(20, 20, "green", 280, 200-i*40, "red")}
         previous = previous.next;
     }
 }    
@@ -119,21 +119,35 @@ function updateGameArea() {
         detectHit();
 	}
     
-    linkedListUpdate(enemy);
+    if (enemy)
+        linkedListUpdate(enemy);
     refresh(player);
 }
 
 function detectHit() {
     var current = bullet;
     var x = 0;
-    if (!current.next) {
+    while (current) {
         var currentEnemy = enemy;
+        var previousEnemy;
         while (currentEnemy) {
-            if (bullet.data.crashWith(currentEnemy.data)) {
+            //if (current.data instanceof Array)
+            if (current.data.crashWith(currentEnemy.data)) {
                 bullet = 0;
+
+                if (previousEnemy)
+                    previousEnemy.next = currentEnemy.next;
+                else if (currentEnemy.next)
+                    enemy = currentEnemy.next
+                else
+                    enemy = null;
+                
+                return; //This fixed shuddering when bullet hits
             }
+            previousEnemy = currentEnemy;
             currentEnemy = currentEnemy.next;
         }
+        current = current.next;
     }
 }    
     
@@ -176,7 +190,7 @@ function shoot(x,y) {
 	
 	if (gun == 0) {
 		if (!bullet) {
-			bullet = {data: new component(6, 6, "black", player.x, player.y, "bullet"),
+			bullet = {data: new component(6, 6, "blue", player.x, player.y, "bullet"),
 			next: null};
 			bullet.data.speedX = target[0];
 			bullet.data.speedY = target[1];
@@ -187,7 +201,7 @@ function shoot(x,y) {
 			while (current.next != null)
 				current = current.next;
 			
-			current.next = {data: new component(6, 6, "black", player.x, player.y, "bullet"),
+			current.next = {data: new component(6, 6, "red", player.x, player.y, "bullet"),
 			next: null};
 			current.next.data.speedX = target[0];
 			current.next.data.speedY = target[1];
