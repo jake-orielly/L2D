@@ -17,7 +17,7 @@ var enemy;
 var bullet;
 var boardY = 700;
 var boardX = 700;
-var bulletSpeed = 10;
+var bulletSpeed = 4;
 
 //0 = pistol, 1 = shotgun
 var gun = 0;
@@ -126,14 +126,19 @@ function updateGameArea() {
 
 function detectHit() {
     var current = bullet;
-    var x = 0;
+    var previous = null;
     while (current) {
         var currentEnemy = enemy;
         var previousEnemy;
         while (currentEnemy) {
             //if (current.data instanceof Array)
             if (current.data.crashWith(currentEnemy.data)) {
-                bullet = 0;
+                if (previous)
+                    previous.next = current.next;
+                else if (current.next)
+                    bullet = bullet.next;
+                else 
+                    bullet = null;
 
                 if (previousEnemy)
                     previousEnemy.next = currentEnemy.next;
@@ -143,10 +148,16 @@ function detectHit() {
                     enemy = null;
                 
                 return; //This fixed shuddering when bullet hits
+                
             }
+            if (!currentEnemy.next)
+                break;
             previousEnemy = currentEnemy;
             currentEnemy = currentEnemy.next;
         }
+        if (!current.next)
+                break;
+        previous = current;
         current = current.next;
     }
 }    
