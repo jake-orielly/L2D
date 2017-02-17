@@ -131,24 +131,40 @@ function detectHit() {
         var currentEnemy = enemy;
         var previousEnemy;
         while (currentEnemy) {
-            //if (current.data instanceof Array)
-            if (current.data.crashWith(currentEnemy.data)) {
-                if (previous)
-                    previous.next = current.next;
-                else if (current.next)
-                    bullet = bullet.next;
-                else 
-                    bullet = null;
+            if (current.data instanceof Array) {
+                document.wrtie("stahp");
+                for (var i = 0; i < current.data.length; i++) {
+                    if (current.data[i].crashWith(currentEnemy.data)) {
+                        current.data[i] = null;
 
-                if (previousEnemy)
-                    previousEnemy.next = currentEnemy.next;
-                else if (currentEnemy.next)
-                    enemy = currentEnemy.next
-                else
-                    enemy = null;
-                
-                return; //This fixed shuddering when bullet hits
-                
+                        if (previousEnemy)
+                            previousEnemy.next = currentEnemy.next;
+                        else if (currentEnemy.next)
+                            enemy = currentEnemy.next
+                        else
+                            enemy = null;
+                    }
+                }
+            }
+            else {
+                if (current.data.crashWith(currentEnemy.data)) {
+                    if (previous)
+                        previous.next = current.next;
+                    else if (current.next)
+                        bullet = bullet.next;
+                    else 
+                        bullet = null;
+
+                    if (previousEnemy)
+                        previousEnemy.next = currentEnemy.next;
+                    else if (currentEnemy.next)
+                        enemy = currentEnemy.next
+                    else
+                        enemy = null;
+
+                    return; //This fixed shuddering when bullet hits
+
+                }
             }
             if (!currentEnemy.next)
                 break;
@@ -169,6 +185,9 @@ function linkedListUpdate(given) {
 			current.data.forEach(function(i) {
 				refresh(i);
 			});
+        else if (current.data.data) {
+            refresh(current.data.data);
+        }
 		else 
 			refresh(current.data);
 		
@@ -177,6 +196,9 @@ function linkedListUpdate(given) {
 				current.next.data.forEach(function(i) {
 				refresh(i);
 				});
+            else if (current.next.data) {
+                refresh(current.next.data);
+            }
 			else 
 				refresh(current.next.data);
 			current = current.next;
@@ -220,17 +242,20 @@ function shoot(x,y) {
 	}
 	else if (gun == 1) {
 		if (!bullet) {
-			var pellets = [];
-			for (var i = 0; i < shotgun.pellets; i++)
-				pellets[i] = new component(3, 3, "black", player.x, player.y, "bullet");
+			var pellets = {data: new component(3, 3, "black", player.x, player.y, "bullet"), next: null};
+            var current = pellets;
+            var newPellet;
+			for (var i = 0; i < shotgun.pellets-1; i++) {
+				newPellet = {data: new component(3, 3, "black", player.x, player.y, "bullet"), next: null};
+                target = targetMouse(x+spread(shotgun.spread),y+spread(shotgun.spread));
+				newPellet.speedX = target[0];
+				newPellet.speedY = target[1];
+                current.next = newPellet;
+                current = newPellet;
+            }
+            
 			
 			bullet = {data: pellets, next: null};
-			
-			for (var i = 0; i < bullet.data.length; i++) {
-				target = targetMouse(x+spread(shotgun.spread),y+spread(shotgun.spread));
-				bullet.data[i].speedX = target[0];
-				bullet.data[i].speedY = target[1];
-			}
 		}
 		
 		else {
